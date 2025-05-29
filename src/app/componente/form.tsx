@@ -1,39 +1,40 @@
 "use client";
-
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import "/src/app/style.css";
 import { useDropzone } from "react-dropzone";
 
 export const Form = () => {
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [legendField, setLegendField] = useState("");
+  const [progressUpload, setProgressUpload] = useState(0);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    multiple: true,
     onDrop: (files) => {
-      const file = files[0];
-      if (file) {
-        setSelectedFile(file);
-        setFotoString(URL.createObjectURL(file));
-      }
+      setSelectedFiles(files);
+      const previews = files.map((file) => URL.createObjectURL(file));
+      setPhotoPreviews(previews);
     },
   });
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [legendField, setLegendField] = useState("");
-  const [progressUpload, setProgressUpload] = useState(0);
-  const [photoString, setFotoString] = useState("");
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setFotoString(URL.createObjectURL(file));
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setSelectedFiles(filesArray);
+      const previews = filesArray.map((file) => URL.createObjectURL(file));
+      setPhotoPreviews(previews);
     }
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile) return;
+    if (selectedFiles.length === 0) return;
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    selectedFiles.forEach((file, index) => {
+      formData.append("files[]", file); // Backend must support multiple files under the same key
+    });
     formData.append("legend", legendField);
 
     const url = "https://b7web.com.br/uploadtest/";
@@ -72,13 +73,13 @@ export const Form = () => {
         {...getRootProps()}
       >
         <input {...getInputProps()} hidden />
-        <p>Arraste e solte o arquivo aqui ou clique para selecionar</p>
+        <p>Arraste e solte os arquivos aqui ou clique para selecionar</p>
       </div>
 
-      <div>Arquivos: {acceptedFiles.length}</div>
+      <div>Arquivos: {selectedFiles.length}</div>
 
       {/* Upload Manual */}
-      <input type="file" className="input" onChange={handleFileChange} />
+      <input type="file" className="input" multiple onChange={handleFileChange} />
 
       <input
         type="text"
@@ -101,14 +102,17 @@ export const Form = () => {
 
       <div className="progress-text">{progressUpload.toFixed(1)}%</div>
 
-      {photoString && (
-        <img
-          src={photoString}
-          alt="Pré-visualização"
-          className="image-preview"
-          style={{ marginLeft: "150px", width: "280px" }}
-        />
-      )}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "10px" }}>
+        {photoPreviews.map((src, index) => (
+          <img
+            key={index}
+            src={src}
+            alt={`Pré-visualização ${index}`}
+            className="image-preview"
+            style={{ width: "120px", borderRadius: "8px" }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
