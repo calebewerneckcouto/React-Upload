@@ -73,3 +73,13 @@
   left: 0;
   cursor: pointer;
 }
+.image-preview {
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+}
+
+.image-preview:hover {
+  transform: scale(3);
+  z-index: 10;
+  position: relative;
+}

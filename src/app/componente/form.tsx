@@ -11,6 +11,7 @@ export const Form = () => {
   const [selectedFile, setSelectedFile] = useState<File>();
   const [legendField, setLegendField] = useState("");
   const [progressUpload, setProgressUpload] = useState(0);
+  const [photoString,setFotoString] = useState('');
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -19,11 +20,14 @@ export const Form = () => {
   };
 
   const handleSubmit = async () => {
+
+
     if (selectedFile) {
+      
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("legend", legendField);
-
+     
       const url = "https://b7web.com.br/uploadtest/";
       await axios.post(url, formData, {
         onUploadProgress: (progressEvent) => {
@@ -38,6 +42,7 @@ export const Form = () => {
 
   useEffect(() => {
     if (acceptedFiles.length > 0) {
+      setFotoString(URL.createObjectURL(acceptedFiles[0]))
       setSelectedFile(acceptedFiles[0]);
       handleSubmit();
     }
@@ -88,6 +93,14 @@ export const Form = () => {
       </div>
 
       <div className="progress-text">{progressUpload.toFixed(1)}%</div>
+     {photoString && (
+  <img 
+    src={photoString} 
+    className="image-preview"
+    style={{ marginLeft:'150px', width: '280px' }} 
+  />
+)}
+
     </div>
   );
 };
