@@ -52,3 +52,24 @@
   margin-top: 5px;
   font-weight: bold;
 }
+.dropzone {
+  background-color: #9ca3af; /* equivalente ao bg-gray-400 */
+  height: 24rem;             /* equivalente ao h-96 */
+  padding: 1.25rem;          /* equivalente ao p-5 */
+  border: 2px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.dropzone input[type="file"] {
+  opacity: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}

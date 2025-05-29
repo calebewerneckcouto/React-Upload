@@ -1,10 +1,13 @@
 "use client";
 
 import axios from "axios";
-import { ChangeEvent, useState } from "react";
-import '/src/app/style.css'; // Certifique-se de que este arquivo existe
+import { ChangeEvent, useEffect, useState } from "react";
+import '/src/app/style.css';
+import { useDropzone } from "react-dropzone";
 
 export const Form = () => {
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
+
   const [selectedFile, setSelectedFile] = useState<File>();
   const [legendField, setLegendField] = useState("");
   const [progressUpload, setProgressUpload] = useState(0);
@@ -33,8 +36,39 @@ export const Form = () => {
     }
   };
 
+  useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      setSelectedFile(acceptedFiles[0]);
+      handleSubmit();
+    }
+  }, [acceptedFiles]);
+
   return (
     <div className="form-container">
+
+      {/* Área de Dropzone */}
+      <div
+        className="dropzone"
+        style={{
+          backgroundColor: 'grey',
+          width: '525px',
+          height: '96px',
+          borderRadius: '15px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '10px',
+          cursor: 'pointer'
+        }}
+        {...getRootProps()}
+      >
+        <input {...getInputProps()} hidden />
+        <p>Arraste e solte o arquivo aqui ou clique para selecionar</p>
+      </div>
+
+      <div>Arquivos: {acceptedFiles.length}</div>
+
+      {/* Upload Manual (fora da Dropzone) */}
       <input type="file" className="input" onChange={handleFileChange} />
 
       <input
